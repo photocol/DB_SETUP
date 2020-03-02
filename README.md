@@ -1,3 +1,5 @@
 # DB_SETUP
 mysql -u root -p;
-source <script path>;
+source ./deleteall.sql;
+source ./dbload.sql;
+source ./testcase.sql;
