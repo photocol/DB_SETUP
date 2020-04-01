@@ -6,3 +6,5 @@ CREATE TABLE IF NOT EXISTS collection(cid INT NOT NULL AUTO_INCREMENT, pub TINYI
 CREATE TABLE IF NOT EXISTS photo(pid INT NOT NULL AUTO_INCREMENT, uri VARCHAR(255), upload_date DATE, description VARCHAR(255), uid INT NOT NULL, orig_uid INT NOT NULL, PRIMARY KEY(pid));
 CREATE TABLE IF NOT EXISTS acl(cid INT NOT NULL, uid INT NOT NULL, role INT NOT NULL, PRIMARY KEY(cid, uid));
 CREATE TABLE IF NOT EXISTS icj(pid INT NOT NULL, cid INT NOT NULL, PRIMARY KEY(pid, cid));
+GRANT USAGE ON *.* TO 'photo_server'@'localhost' IDENTIFIED BY 'password';
+GRANT ALL privileges ON `photocol`.* TO 'photo_server'@localhost;
