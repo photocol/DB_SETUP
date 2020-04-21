@@ -1,9 +1,9 @@
 FROM mariadb:latest
 
 WORKDIR ./
-COPY . .
+COPY ./script .
 
-ENV PACKAGES openssh-server openssh-client
+ENV PACKAGES openssh-server openssh-client vim mariadb-client mysql-client
 ENV MYSQL_DATABASE photocol
 ENV MYSQL_ALLOW_EMPTY_PASSWORD yes
 
