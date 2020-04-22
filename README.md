@@ -1,7 +1,7 @@
 # DB_SETUP
 
-Install docker
-Install docker-compose
+Install docker\n
+Install docker-compose\n
 under directory ./
 run ./clear.sh
 then
