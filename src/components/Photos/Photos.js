@@ -3,8 +3,10 @@ import PropTypes from 'prop-types';
 import './Photos.css';
 import ApiConnectionManager from "../../util/ApiConnectionManager";
 import store from "../../util/Store";
-import { Link } from "react-router-dom"
+import {Link, withRouter} from "react-router-dom"
 import { env } from "../../util/Environment";
+import {connect} from "react-redux";
+import Authenticator from "../Authenticator/Authenticator";
 
 class Photos extends React.Component {
   constructor(props) {
@@ -15,68 +17,90 @@ class Photos extends React.Component {
       isSelected: false,
     };
 
+    this.history = props.history;
+
+    // if used as selection component
+    // state.isSelected is used as temporary select (if component), isSelect is used if only used for selecting photos
+    this.isSelect = props.onSelect !== null;
+    this.isSelect && (this.onSelect = props.onSelect);
   }
 
   componentDidMount() {
     this.getPhotoList();
   }
 
+  confirmPhotoSelection = () => {
+    this.onSelect(this.state.photoList.filter(photo => photo.selected));
+  };
+
   render = () => {
+    if(this.props.username==='not logged in')
+      return (<Authenticator onUserAction={this.getPhotoList}/>);
 
-    const selectPhotos = (photo, index) => (
-        <li><input type="checkbox" id={"ph" + index}
-                   checked={photo.selected}
-                   onChange={(evt) => this.setState({
-                     photoList : this.state.photoList.map((p,i) =>
-                       i!=index ? p : {...p,selected:evt.target.checked}
-                     )
-                   })} />
-          <label for={"ph" + index}>
-            <img className="photos" src={`${env.serverUrl}/perma/${photo.uri}`}/>
-          </label>
-        </li>
+    // how to show an image
+    const photoJsx = (photo, index) => (
+      <li key={photo.uri}>
+        <input type="checkbox" id={"ph" + index}
+               checked={photo.selected}
+               onChange={evt => {
+                 // act like checkbox in select mode
+                 this.setState({
+                   photoList: this.state.photoList.map((p, i) =>
+                     i !== index ? p : {...p, selected: evt.target.checked}
+                   )
+                 });
+               }}
+               disabled={!this.isSelect && !this.state.isSelected}/>
+        <label htmlFor={"ph" + index}
+               onClick={() => {
+                 // act like link in non-select mode
+                 if(!this.isSelect && !this.state.isSelected)
+                   this.history.push(`/photo/${photo.uri}`)
+               }}>
+          <img className="photos" src={`${env.serverUrl}/perma/${photo.uri}`}/>
+        </label>
+      </li>
     );
 
-    const notSelectPhotos = (photo) => (
-      <span key={photo.uri}>
-          <Link to={"/photo/" + photo.uri}>
-            <img className="photos" src={`${env.serverUrl}/perma/${photo.uri}`}/>
-          </Link>
-      </span>
-    );
+    return (
+      <div className="Photos">
+        Photos Component
+        <input className="Buttons"
+               type="file"
+               onChange={this.uploadPhoto}
+               multiple />
+        <button className={this.state.isSelected ? "ButtonOn" : ''}
+                onClick={
+                  () => {
+                    this.state.isSelected && this.state.photoList.forEach((photo) => photo.selected = false);
+                    this.setState({isSelected: !this.state.isSelected});
+                  }
+                }>
+          Select Photos
+        </button>
+        {!this.isSelect && this.state.isSelected && <button onClick={this.deleteSelectedPhotos}>Delete Photos</button>}
+        <br/>
 
-    return (<div className="Photos">
-      Photos Component
-      <input className="Buttons"
-             type="file"
-             onChange={this.uploadPhoto}
-             multiple
-      />
-      <button
-        onClick={() => {
-          if(this.state.isSelected === true) {
-            this.state.photoList.forEach((photo) => photo.selected = false)
-          }
-          this.setState({isSelected: !this.state.isSelected});
-        }}
-        className={this.state.isSelected && "ButtonOn"}>
-        Select Photos
-      </button>
-      {this.state.isSelected && <button onClick={this.deleteSelectedPhotos}>Delete Photos</button>}
-      <br/>
-
-      {this.state.photoList.map((photo, index) =>
-        this.state.isSelected === true ? selectPhotos(photo, index) : notSelectPhotos(photo)
-      )}
-    </div>
+        {
+          // listing images
+          this.state.photoList.map((photo, index) => photoJsx(photo, index))
+        }
+        {
+          // for when used as selection component
+          this.isSelect && (<button onClick={this.confirmPhotoSelection}>Select these photos</button>)
+        }
+      </div>
     );
   };
 
   getPhotoList = () => {
     this.acm.request('/photo/currentuser').then(res => {
-      this.setState({ photoList: res.response.map(photo => ({
-        ...photo,selected:false,
-      }) ) });
+      this.setState({
+        photoList: res.response.map(photo => ({
+          ...photo,
+          selected: false,
+        }))
+      });
     }).catch(err => {
       console.error(err);
     });
@@ -84,9 +108,7 @@ class Photos extends React.Component {
 
   deleteSelectedPhotos = () => {
     this.state.photoList.forEach((photo) => {
-      if (photo.selected == true) {
-        this.deletePhoto(photo.uri);
-      }
+      photo.selected && this.deletePhoto(photo.uri);
     })
   };
 
@@ -119,8 +141,15 @@ class Photos extends React.Component {
 }
 
 
-Photos.propTypes = {};
+Photos.propTypes = {
+  onSelect: PropTypes.func
+};
 
-Photos.defaultProps = {};
+Photos.defaultProps = {
+  onSelect: null
+};
 
-export default Photos;
+const mapStateToProps = state => ({
+  username: state.user.username
+});
+export default withRouter(connect(mapStateToProps)(Photos));
