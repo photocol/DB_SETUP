@@ -1,0 +1,36 @@
+version: "3.8"
+services:
+    adminer:
+        image: adminer
+        restart: always
+        ports: 
+            - "8080:8080"
+        
+    db:
+        image: mariadb:latest
+        container_name: photocol_DB
+        restart: always
+        environment: 
+            MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+            MYSQL_DATABASE: photocol
+        volumes:
+            - ./script:/docker-entrypoint-initdb.d
+            - ./data:/var/lib/mysql
+            - /etc/localtime:/etc/localtime:ro
+        ports:
+            - "6600:3306"
+            
+    backup:
+        build: ./backup
+        container_name: photocol-backup
+        restart: always
+        volumes: 
+            - /etc/localtime:/etc/localtime:ro
+            - ./backup/data:/backup
+            - ./backup/backup.sh:/etc/periodic/daily/backup.sh
+        environment:
+            MYSQL_CONTAINER_NAME: photocol_DB
+            MYSQL_DATABASE: photocol
+            MYSQL_USER: photo_server
+            MYSQL_PASSWORD: password
+        command: crond -f -d 8
