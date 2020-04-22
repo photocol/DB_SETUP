@@ -2,6 +2,7 @@ version: "3.8"
 services:
     adminer:
         image: adminer
+        container_name: cont_manage
         restart: always
         ports: 
             - "8080:8080"
@@ -19,6 +20,8 @@ services:
             - /etc/localtime:/etc/localtime:ro
         ports:
             - "6600:3306"
+        networks:
+            - back
             
     backup:
         build: ./backup
@@ -33,4 +36,40 @@ services:
             MYSQL_DATABASE: photocol
             MYSQL_USER: photo_server
             MYSQL_PASSWORD: password
+        depends_on:
+            - db
+        networks:
+            - back
         command: crond -f -d 8
+        
+    server:
+        build:
+            context: ./
+            dockerfile: Dokerfile.server
+        container_name: backend
+        restart: always
+        ports:
+            - "6800:4567"
+        depends_on:
+            - db
+        networks:
+            - front
+            - back
+            
+    webclient:
+        build:
+            context: ./
+            dockerfile: Dockerfile.web
+        container_name: frontend
+        restart: always
+        ports:
+            - "6700:80"
+        depends_on:
+            - server
+        networks:
+            - front
+        
+networks:
+    front:
+    back:
+    
