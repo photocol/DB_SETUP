@@ -13,7 +13,7 @@ chmod a+x tree
 
 . ./tree && setup
 
-pull subtree(pull all):
+pull subtree(pull all, recommended):
 
 . ./tree && pull
 
