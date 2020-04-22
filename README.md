@@ -4,6 +4,16 @@ Install docker
 
 Install docker-compose
 
+docker-compose up -d
+
+(website at localhost:6700)
+
+(server at localhost:6800)
+
+(database at localhost:6600)
+
+(manage at localhost:8080)
+
 
 under directory ./
 
