@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# prints the input
+function setup() {
+    git remote add server git@github.com:photocol/photocol-server.git
+    git remote add website git@github.com:photocol/photocol-website.git
+    git subtree add --prefix=server/ server endpointsv1 --squash
+    git subtree add --prefix=website/ website dev --squash
+}
+
+function pull() {
+    if [ $# -eq 0 ]
+        then
+        git subtree pull --prefix=server server endpointsv1 --squash
+        git subtree pull --prefix=website website dev --squash
+        else
+        git subtree pull --prefix=$1 $1 $2 --squash
+    fi
+    
+}
