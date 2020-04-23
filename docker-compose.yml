@@ -2,10 +2,13 @@ version: "3.8"
 services:
     adminer:
         image: adminer
-        container_name: cont_manage
+        container_name: admin_manage
         restart: always
         ports: 
             - "8080:8080"
+        networks:
+            - back
+            - front
         
     db:
         image: mariadb:latest
@@ -22,6 +25,7 @@ services:
             - "6600:3306"
         networks:
             - back
+            - front
             
     backup:
         build: ./backup
@@ -50,6 +54,8 @@ services:
         restart: always
         ports:
             - "6800:4567"
+        links:
+            - "db:database"
         depends_on:
             - db
         networks:
@@ -64,10 +70,14 @@ services:
         restart: always
         ports:
             - "6700:80"
+        links:
+            - "server:backend"
         depends_on:
+            - db
             - server
         networks:
             - front
+            - back
         
 networks:
     front:
