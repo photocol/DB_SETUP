@@ -41,9 +41,10 @@ CREATE TABLE IF NOT EXISTS photo (
     uid INT                     NOT NULL,
     orig_uid INT,
 
-    /* selected (optional) image metadata */
+    /* selected (optional) photo metadata */
     exposure_time DOUBLE,
     f_number DOUBLE,
+    iso INT,
     width INT,
     height INT,
     capture_date DATE,
