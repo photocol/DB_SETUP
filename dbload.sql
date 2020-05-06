@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS collection (
     pub TINYINT(1)              NOT NULL,
     name VARCHAR(50)            NOT NULL,
     uri VARCHAR(50)             NOT NULL,
+    description VARCHAR(1000),
     cover_photo INT,
     INDEX(uri),
     PRIMARY KEY(cid)
