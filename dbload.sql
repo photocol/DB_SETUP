@@ -14,7 +14,6 @@ CREATE TABLE IF NOT EXISTS user (
     display_name VARCHAR(50),
     profile_photo INT,
     INDEX(username),
-    FOREIGN KEY(profile_photo) REFERENCES photo(pid) ON DELETE SET NULL,
     PRIMARY KEY(uid)
 );
 
@@ -26,7 +25,6 @@ CREATE TABLE IF NOT EXISTS collection (
     uri VARCHAR(50)             NOT NULL,
     cover_photo INT,
     INDEX(uri),
-    FOREIGN KEY(cover_photo) REFERENCES photo(pid) ON DELETE SET NULL,
     PRIMARY KEY(cid)
 );
 
@@ -82,3 +80,9 @@ CREATE TABLE IF NOT EXISTS friends (
     FOREIGN KEY(uid2) REFERENCES user(uid) ON DELETE CASCADE,
     PRIMARY KEY(uid1, uid2)
 );
+
+/* add constraints; cannot do this in table creation because circular */
+ALTER TABLE user
+    ADD FOREIGN KEY(profile_photo) REFERENCES photo(pid) ON DELETE SET NULL;
+ALTER TABLE collection
+    ADD FOREIGN KEY(cover_photo) REFERENCES photo(pid) ON DELETE SET NULL;
