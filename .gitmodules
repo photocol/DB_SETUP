@@ -1,0 +1,8 @@
+[submodule "server"]
+	path = server
+	url = git@github.com:photocol/photocol-server.git
+	branch = endpointsv1
+[submodule "website"]
+	path = photocol-website
+	url = git@github.com:photocol/photocol-website.git
+	branch = dev
