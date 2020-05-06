@@ -1,6 +1,6 @@
+/* initialize photocol table structure */
 CREATE DATABASE IF NOT EXISTS photocol;
 USE photocol;
-SHOW DATABASES;
 
 /* main user table */
 CREATE TABLE IF NOT EXISTS user (
