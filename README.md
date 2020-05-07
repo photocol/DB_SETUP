@@ -17,7 +17,7 @@ custom:
 . ./tree && pull [server/website] [branch]
 ```
 
-### push (subtree ignored)
+### push (subtree ignored, default: master)
 ```bash
 . ./tree && push [branch]
 ```
