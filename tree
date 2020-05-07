@@ -26,6 +26,12 @@ function pull() {
     
 }
 
+function push() {
+    git add .
+    git commit -m "auto"
+    git push origin $1
+}
+
 function clear() {
     rm -rf server website
 }
