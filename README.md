@@ -1,11 +1,11 @@
 # DB_SETUP
 
-### Setup git subtree
+### Setup git subtree:
 
 ```bash
 . ./tree && setup
 ```
-### pull subtree
+### pull subtree:
 default: website [dev]
 default: server [endpointsv1]
 
@@ -17,17 +17,20 @@ custom:
 . ./tree && pull [server/website] [branch]
 ```
 
-### push (subtree ignored, default: master)
+### push (subtree ignored, default: master):
 ```bash
 . ./tree && push [branch]
 ```
 
-
+### Dependency:
 ```bash
 sudo pacman -S docker
 
 sudo pacman -S docker-compose
 
+```
+### Start:
+```bash
 ./clear.sh
 
 sudo docker-compose up -d
@@ -40,7 +43,15 @@ sudo docker-compose up -d
 
 (manage at localhost:8080)
 
-to stop:
+### Stop:
 ```bash
 sudo docker-compose down
+```
+### Rebuild Docker network
+```bash
+sudo docker-compose up --build
+```
+### Reset Database:
+```bash
+rm -rf data/
 ```
