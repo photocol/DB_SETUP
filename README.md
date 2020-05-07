@@ -23,12 +23,15 @@ custom:
 ```
 
 
-Install docker
+```bash
+sudo pacman -S docker
 
-Install docker-compose
+sudo pacman -S docker-compose
 
-docker-compose up -d
+./clear.sh
 
+sudo docker-compose up -d
+```
 (website at localhost:6700)
 
 (server at localhost:6800)
@@ -37,16 +40,7 @@ docker-compose up -d
 
 (manage at localhost:8080)
 
-
-under directory ./
-
-run ./clear.sh
-
-then
-
-sudo docker-compose up -d
-
 to stop:
-
+```bash
 sudo docker-compose down
-
+```
