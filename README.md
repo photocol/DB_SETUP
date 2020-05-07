@@ -1,5 +1,28 @@
 # DB_SETUP
 
+### Setup git subtree
+
+```bash
+. ./tree && setup
+```
+### pull subtree
+default: website [dev]
+default: server [endpointsv1]
+
+```bash
+. ./tree && pull
+```
+custom:
+```bash
+. ./tree && pull [server/website] [branch]
+```
+
+### push (subtree ignored)
+```bash
+. ./tree && push [branch]
+```
+
+
 Install docker
 
 Install docker-compose
@@ -16,20 +39,6 @@ docker-compose up -d
 
 
 under directory ./
-
-setup git subtree: 
-
-chmod a+x tree
-
-. ./tree && setup
-
-pull subtree(pull all, recommended):
-
-. ./tree && pull
-
-or:
-
-. ./tree && pull $name $branch
 
 run ./clear.sh
 
