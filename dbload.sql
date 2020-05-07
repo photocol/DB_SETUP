@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS photo (
     pid INT                     NOT NULL AUTO_INCREMENT,
     uri VARCHAR(30)             NOT NULL,
     filename VARCHAR(255)       NOT NULL,
-    mime_type VARCHAR(10)       NOT NULL,
+    mime_type VARCHAR(255)      NOT NULL,
     upload_date DATE            NOT NULL,
     caption VARCHAR(1000),
     uid INT                     NOT NULL,
