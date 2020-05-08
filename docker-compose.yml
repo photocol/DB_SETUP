@@ -52,9 +52,9 @@ services:
             context: ./
             dockerfile: Dockerfile.server
         container_name: backend
+        environment:
+            DB_URL: "jdbc:mysql://db/"
         restart: always
-        expose:
-            - "4567"
         ports:
             - "6700:4567"
         links: 
@@ -71,11 +71,12 @@ services:
             context: ./
             dockerfile: Dockerfile.web
         container_name: frontend
+        volumes: 
+            - ./logs/client/:/var/log/nginx/
+            - /etc/localtime:/etc/localtime:ro
         restart: always
         ports:
             - "1111:80"
-        links: 
-            - "server:test"
         depends_on:
             - server
         networks:

@@ -5,3 +5,5 @@ data/
 backup/data/
 server/
 website/
+.aws/
+logs/
