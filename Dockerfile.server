@@ -11,5 +11,4 @@ FROM openjdk:8-jre-alpine
 WORKDIR /app
 
 COPY --from=medium /app/target/photocol-server-*.jar ./server.jar
-EXPOSE 4567
 ENTRYPOINT ["java","-jar","server.jar"]
