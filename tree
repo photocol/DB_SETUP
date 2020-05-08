@@ -6,8 +6,8 @@ function setup() {
     git remote remove website
     git remote add server https://github.com/photocol/photocol-server.git
     git remote add website https://github.com/photocol/photocol-website.git
-    git subtree add --prefix=server/ server endpointsv1 --squash
-    git subtree add --prefix=website/ website dev --squash
+    git subtree add --prefix=server/ server dbv2 --squash
+    git subtree add --prefix=website/ website dbv2 --squash
     git rm -r --cached website/
     git rm -r --cached server/
     mvn -N io.takari:maven:wrapper -f ./server
@@ -16,9 +16,9 @@ function setup() {
 function pull() {
     if [ $# -eq 0 ]
         then
-        git subtree pull --prefix=server server endpointsv1 --squash
+        git subtree pull --prefix=server server dbv2 --squash
         mvn -N io.takari:maven:wrapper -f ./server
-        git subtree pull --prefix=website website dev --squash
+        git subtree pull --prefix=website website dbv2 --squash
         git rm -r --cached website/
         git rm -r --cached server/
         else
