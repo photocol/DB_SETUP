@@ -71,6 +71,9 @@ services:
             context: ./
             dockerfile: Dockerfile.web
         container_name: frontend
+        volumes: 
+            - ./logs/client/:/var/log/nginx/
+            - /etc/localtime:/etc/localtime:ro
         restart: always
         ports:
             - "1111:80"
