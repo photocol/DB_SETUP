@@ -1,4 +1,4 @@
-FROM openjdk:8-jdk-alpine as medium
+FROM openjdk:15-jdk-alpine as medium
 WORKDIR /app
 COPY ./server/pom.xml .
 COPY ./server/mvnw .
@@ -7,9 +7,8 @@ RUN ./mvnw dependency:go-offline -B
 COPY ./server/src ./src
 RUN ./mvnw package -DskipTests
 
-FROM openjdk:8-jre-alpine
+FROM openjdk:15-jdk-alpine
 WORKDIR /app
 
 COPY --from=medium /app/target/photocol-server-*.jar ./server.jar
-EXPOSE 4567
 ENTRYPOINT ["java","-jar","server.jar"]

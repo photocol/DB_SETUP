@@ -21,10 +21,10 @@ services:
             - ./script:/docker-entrypoint-initdb.d
             - ./data:/var/lib/mysql
             - /etc/localtime:/etc/localtime:ro
-        ports:
-            - "6600:3306"
         expose:
             - "3306"
+        ports:
+            - "6600:3306"
         networks:
             - back
             
@@ -54,14 +54,15 @@ services:
         container_name: backend
         restart: always
         ports:
-            - "6800:4567"
+            - "6700:4567"
         links: 
             - "db:database"
         depends_on:
             - db
         networks:
-            - front
             - back
+            - front
+
             
     webclient:
         build:
@@ -70,7 +71,9 @@ services:
         container_name: frontend
         restart: always
         ports:
-            - "6700:80"
+            - "1111:80"
+        links: 
+            - "server:test"
         depends_on:
             - server
         networks:

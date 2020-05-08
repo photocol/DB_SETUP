@@ -2,8 +2,10 @@
 
 # prints the input
 function setup() {
-    git remote add server git@github.com:photocol/photocol-server.git
-    git remote add website git@github.com:photocol/photocol-website.git
+    git remote remove server
+    git remote remove website
+    git remote add server https://github.com/photocol/photocol-server.git
+    git remote add website https://github.com/photocol/photocol-website.git
     git subtree add --prefix=server/ server endpointsv1 --squash
     git subtree add --prefix=website/ website dev --squash
     git rm -r --cached website/
