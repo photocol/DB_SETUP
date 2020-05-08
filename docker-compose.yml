@@ -72,8 +72,6 @@ services:
         restart: always
         ports:
             - "1111:80"
-        links: 
-            - "server:test"
         depends_on:
             - server
         networks:
