@@ -52,6 +52,8 @@ services:
             context: ./
             dockerfile: Dockerfile.server
         container_name: backend
+        environment:
+            DB_URL: "jdbc:mysql://db/"
         restart: always
         ports:
             - "6700:4567"
