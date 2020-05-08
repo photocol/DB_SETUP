@@ -4,7 +4,7 @@ import photocol.definitions.ACLEntry;
 import photocol.definitions.Photo;
 import photocol.definitions.PhotoCollection;
 import photocol.definitions.exception.HttpMessageException;
-import photocol.layer.DataBase.Method.InitDB;
+import photocol.util.DBConnectionClient;
 
 import static photocol.definitions.ACLEntry.ACLOperation.*;
 import static photocol.definitions.exception.HttpMessageException.Error.*;
@@ -12,13 +12,12 @@ import static photocol.definitions.exception.HttpMessageException.Error.*;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class CollectionStore {
 
     private Connection conn;
-    public CollectionStore() {
-        this.conn = new InitDB().initialDB("photocol");
+    public CollectionStore(DBConnectionClient dbClient) {
+        conn = dbClient.getConnection();
     }
 
     /**
@@ -30,7 +29,8 @@ public class CollectionStore {
      */
     public List<PhotoCollection> getUserCollections(int uid, String username) throws HttpMessageException {
         try {
-            PreparedStatement stmt = conn.prepareStatement("SELECT username as owner, pub, name, uri, acl1.role " +
+            PreparedStatement stmt = conn.prepareStatement("SELECT username as owner, pub, name, uri, description, " +
+                    "cover_photo, acl1.role " +
                     "FROM collection " +
                     "INNER JOIN acl AS acl1 ON collection.cid=acl1.cid " +
                     "INNER JOIN acl AS acl2 ON collection.cid=acl2.cid " +
@@ -46,7 +46,7 @@ public class CollectionStore {
                 aclList.add(new ACLEntry(username, rs.getInt("role")));
                 aclList.add(new ACLEntry(rs.getString("owner"), ACLEntry.Role.ROLE_OWNER));
 
-                photoCollections.add(new PhotoCollection(rs.getBoolean("pub"), rs.getString("name"), aclList));
+                photoCollections.add(new PhotoCollection(rs.getBoolean("pub"), rs.getString("name"), aclList, "", ""));
             }
             return photoCollections;
         } catch(SQLException err) {
@@ -130,14 +130,19 @@ public class CollectionStore {
     public PhotoCollection getCollection(int cid) throws HttpMessageException {
         try {
             // get collection details
-            PreparedStatement stmt = conn.prepareStatement("SELECT name, uri, pub FROM collection WHERE cid=?");
+            PreparedStatement stmt = conn.prepareStatement("SELECT name, pub, description, photo.uri as cover_photo " +
+                    "FROM collection " +
+                    "LEFT JOIN photo ON cover_photo=pid " +
+                    "WHERE cid=?");
             stmt.setInt(1, cid);
             ResultSet rs = stmt.executeQuery();
+
             if(!rs.next())
                 throw new HttpMessageException(401, COLLECTION_NOT_FOUND);
             String collectionName = rs.getString("name");
-            String collectionUri = rs.getString("uri");
             boolean collectionIsPublic = rs.getBoolean("pub");
+            String description = rs.getString("description");
+            String coverPhotoUri = rs.getString("cover_photo");
 
             // get acl list
             stmt = conn.prepareStatement("SELECT username, role FROM " +
@@ -150,15 +155,24 @@ public class CollectionStore {
                 aclList.add(new ACLEntry(rs.getString("username"), rs.getInt("role")));
 
             // get photo list
-            stmt = conn.prepareStatement("SELECT uri,description,upload_date FROM photo " +
+            stmt = conn.prepareStatement("SELECT uri, caption, filename, upload_date, width, height FROM photo " +
                     "INNER JOIN icj ON icj.pid=photo.pid WHERE icj.cid=?");
             stmt.setInt(1, cid);
             rs = stmt.executeQuery();
             List<Photo> photoList = new ArrayList<>();
-            while(rs.next())
-                photoList.add(new Photo(rs.getString("uri"), rs.getString("description"), rs.getDate("upload_date")));
+            while(rs.next()) {
+                Photo.PhotoMetadata photoMetadata = new Photo.PhotoMetadata();
+                photoMetadata.width = rs.getInt("width");
+                photoMetadata.height = rs.getInt("height");
+                photoList.add(new Photo(rs.getString("uri"),
+                                        rs.getString("filename"),
+                                        rs.getString("caption"),
+                                        rs.getDate("upload_date"),
+                                        photoMetadata));
+            }
 
-            PhotoCollection photoCollection = new PhotoCollection(collectionIsPublic, collectionName, collectionUri, aclList);
+            PhotoCollection photoCollection = new PhotoCollection(collectionIsPublic, collectionName,
+                    aclList, coverPhotoUri, description);
             photoCollection.setPhotos(photoList);
 
             return photoCollection;
@@ -245,7 +259,7 @@ public class CollectionStore {
     }
 
     /**
-     * Update collection attributes or acl
+     * Update collection attributes or acl. Assume validation already completed
      * @param cid               collection cid
      * @param photoCollection   attributes to change
      * @param ownerUid          owner uid
@@ -263,7 +277,25 @@ public class CollectionStore {
                 stmt.executeUpdate();
             }
 
-            // update acl list; do all as one callback
+            // update description, if specified
+            if(photoCollection.description != null) {
+                PreparedStatement stmt = conn.prepareStatement("UPDATE collection SET description=? WHERE cid=?");
+                stmt.setString(1, photoCollection.description);
+                stmt.setInt(2, cid);
+                stmt.executeUpdate();
+            }
+
+            // update cover photo, if specified
+            if(photoCollection.coverPhotoUri != null) {
+                PreparedStatement stmt = conn.prepareStatement("UPDATE collection " +
+                        "SET cover_photo=(SELECT pid FROM photo WHERE uri=?) " +
+                        "WHERE cid=?");
+                stmt.setString(1, photoCollection.coverPhotoUri);
+                stmt.setInt(2, cid);
+                stmt.executeUpdate();
+            }
+
+            // update acl list; do all as one transaction
             if (photoCollection.aclList.size() > 0) {
                 conn.setAutoCommit(false);
 
@@ -334,13 +366,10 @@ public class CollectionStore {
      */
     public boolean deleteCollection(int cid) throws HttpMessageException {
         try {
-            PreparedStatement stmt = conn.prepareStatement("DELETE collection, icj, acl FROM collection " +
-                    "LEFT JOIN icj ON icj.cid=collection.cid " +
-                    "LEFT JOIN acl ON acl.cid=collection.cid " +
-                    "WHERE collection.cid=?");
+            // delete collection; should gracefully cascade into deleting icj and acl entries
+            PreparedStatement stmt = conn.prepareStatement("DELETE FROM collection WHERE collection.cid=?");
             stmt.setInt(1, cid);
             stmt.executeUpdate();
-
             return true;
         } catch(SQLException err) {
             err.printStackTrace();

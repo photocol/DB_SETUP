@@ -2,7 +2,7 @@ package photocol.layer.store;
 
 import photocol.definitions.Photo;
 import photocol.definitions.exception.HttpMessageException;
-import photocol.layer.DataBase.Method.InitDB;
+import photocol.util.DBConnectionClient;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -13,9 +13,8 @@ import static photocol.definitions.exception.HttpMessageException.Error.*;
 public class PhotoStore {
 
     private Connection conn;
-    public PhotoStore() {
-        // TODO: change this
-        this.conn = new InitDB().initialDB("photocol");
+    public PhotoStore(DBConnectionClient dbClient) {
+        conn = dbClient.getConnection();
     }
 
     /**
@@ -45,16 +44,23 @@ public class PhotoStore {
      */
     public List<Photo> getUserPhotos(int uid) throws HttpMessageException {
         try {
-            PreparedStatement stmt = conn.prepareStatement("SELECT uri,description,upload_date " +
+            PreparedStatement stmt = conn.prepareStatement("SELECT uri, filename, caption, upload_date, width, height " +
                     "FROM photocol.photo WHERE uid=?");
             stmt.setInt(1, uid);
 
             ResultSet rs = stmt.executeQuery();
             List<Photo> userPhotos = new ArrayList<>();
-            while(rs.next())
+            while(rs.next()) {
+                Photo.PhotoMetadata photoMetadata = new Photo.PhotoMetadata();
+                photoMetadata.width = rs.getInt("width");
+                photoMetadata.height = rs.getInt("height");
                 userPhotos.add(new Photo(rs.getString("uri"),
-                                         rs.getString("description"),
-                                         rs.getDate("upload_date")));
+                                         rs.getString("filename"),
+                                         rs.getString("caption"),
+                                         rs.getDate("upload_date"),
+                                         photoMetadata));
+            }
+
             return userPhotos;
         } catch(SQLException err) {
             err.printStackTrace();
@@ -110,28 +116,64 @@ public class PhotoStore {
 
     /**
      * Create photo in database
-     * @param uri   uri of photo
-     * @param desc  default photo description
-     * @param uid   uid of owner
-     * @return      true on success
+     * @param uri       uri of photo
+     * @param filename  original photo filename
+     * @param uid       uid of owner
+     * @param mimeType  mimetype of file
+     * @return          true on success
      * @throws HttpMessageException on error
      */
-    public boolean createImage(String uri, String desc, int uid) throws HttpMessageException {
+//    public boolean createImage(String uri, String filename, String mimeType, int uid) throws HttpMessageException {
+
+    /**
+     * Create photo in database
+     * @param photo     photo object
+     * @param uid       uid of owner
+     * @return          true on success
+     * @throws HttpMessageException on failure
+     */
+    public boolean createPhoto(Photo photo, int uid) throws HttpMessageException {
         // assume uri is already checked to be unique in service layer
         try {
             PreparedStatement stmt = conn.prepareStatement("INSERT INTO photocol.photo " +
-                    "(uri, upload_date, description, uid, orig_uid) VALUES(?,?,?,?,?)");
-            stmt.setString(1, uri);
-            stmt.setDate(2, new Date(new java.util.Date().getTime()));
-            stmt.setString(3, desc);
-            stmt.setInt(4, uid);
-            stmt.setInt(5, uid);
+                    "(uri, upload_date, mime_type, filename, width, height, uid, orig_uid) VALUES(?,?,?,?,?,?,?,?)");
+            stmt.setString(1, photo.uri);
+            stmt.setDate(2, new Date(photo.uploadDate.getTime()));
+            stmt.setString(3, photo.metadata.mimeType);
+            stmt.setString(4, photo.filename);
+            stmt.setInt(5, photo.metadata.width);
+            stmt.setInt(6, photo.metadata.height);
+            stmt.setInt(7, uid);
+            stmt.setInt(8, uid);
 
             // this should never happen
             if(stmt.executeUpdate()<1)
                 throw new HttpMessageException(500, DATABASE_QUERY_ERROR);
 
             return true;
+        } catch(SQLException err) {
+            err.printStackTrace();
+            throw new HttpMessageException(500, DATABASE_QUERY_ERROR);
+        }
+    }
+
+    /**
+     * Checks if photo is in specified collection
+     * @param photouri  uri of photo to check
+     * @param cid       collection to check
+     * @return          whether photo is in specified collection
+     * @throws HttpMessageException on failure
+     */
+    public boolean checkIfPhotoInCollection(String photouri, int cid) throws HttpMessageException {
+        try {
+            PreparedStatement stmt = conn.prepareStatement("SELECT photo.pid FROM photo " +
+                    "INNER JOIN icj ON photo.pid=icj.pid " +
+                    "WHERE uri=? AND cid=?");
+            stmt.setString(1, photouri);
+            stmt.setInt(2, cid);
+
+            ResultSet rs = stmt.executeQuery();
+            return rs.next();
         } catch(SQLException err) {
             err.printStackTrace();
             throw new HttpMessageException(500, DATABASE_QUERY_ERROR);
@@ -146,14 +188,10 @@ public class PhotoStore {
      */
     public boolean deletePhoto(int pid) throws HttpMessageException {
         try {
-
-            // TODO: change this to foreign keys, use foreign key cascading
-            //       see: mysqltutorial.org/mysql-on-delete-cascade
-            PreparedStatement stmt = conn.prepareStatement("DELETE photo, icj FROM photo " +
-                    "LEFT JOIN icj ON icj.pid=photo.pid WHERE photo.pid=?");
+            // deleting from photo should cascade down to other tables gracefully
+            PreparedStatement stmt = conn.prepareStatement("DELETE FROM photo WHERE photo.pid=?");
             stmt.setInt(1, pid);
             stmt.executeUpdate();
-
             return true;
         } catch(SQLException err) {
             err.printStackTrace();
