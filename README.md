@@ -38,9 +38,9 @@ sudo pacman -S docker-compose
 
 sudo docker-compose up -d
 ```
-(website at localhost:6700)
+(website at localhost:1111)
 
-(server at localhost:6800)
+(server at localhost:6700)
 
 (database at localhost:6600)
 
