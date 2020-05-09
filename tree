@@ -24,7 +24,7 @@ function pull() {
         git subtree pull --prefix=website website dbv2 --squash
         git rm -r --cached website/
         git rm -r --cached server/
-        git stashpop
+        git stash pop
         else
         git stash
         git subtree pull --prefix=$1 $1 $2 --squash

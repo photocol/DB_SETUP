@@ -57,24 +57,25 @@ sudo docker-compose up --build
 ### Basic docker commands:
 
 #### show running container list: (-a shows all containers, -q only show container id)
-
+```bash
 docker ps 
-
+```
 #### remove all container:
-
+```bash
 docker rm -f $(docker ps -a -q)
-
+```
 #### remove all images:
-
+```bash
 docker rmi -f $(docker images -q)
-
+```
 #### see docker compose log:
-
+```bash
 docker-compose logs -t -f [name]
+```
 #### interactive terminal with container: (service can be bash/sh etc.)
-
+```bash
 docker exec -it [name] [service]
-
+```
 ### Reset Database:
 ```bash
 rm -rf data/
