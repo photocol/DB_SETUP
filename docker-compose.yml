@@ -54,6 +54,8 @@ services:
         container_name: backend
         environment:
             DB_URL: "jdbc:mysql://db/"
+        volumes: 
+            - ./.aws/:/app/.aws/
         restart: always
         ports:
             - "6700:4567"
