@@ -12,19 +12,24 @@ function setup() {
     git rm -r --cached website/
     git rm -r --cached server/
     mvn -N io.takari:maven:wrapper -f ./server
+    git stash pop
 }
 
 function pull() {
     if [ $# -eq 0 ]
         then
+        git stash
         git subtree pull --prefix=server server dbv2 --squash
         mvn -N io.takari:maven:wrapper -f ./server
         git subtree pull --prefix=website website dbv2 --squash
         git rm -r --cached website/
         git rm -r --cached server/
+        git stashpop
         else
+        git stash
         git subtree pull --prefix=$1 $1 $2 --squash
         git rm -r --cached $1
+        git stash pop
     fi
     
 }
