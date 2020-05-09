@@ -8,3 +8,4 @@ website/
 .aws/
 logs/
 src/
+.run/
