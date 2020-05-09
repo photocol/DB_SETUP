@@ -1,6 +1,5 @@
 FROM openjdk:15-jdk-alpine as medium
 WORKDIR /app
-COPY ./.aws/ /.aws
 COPY ./server/pom.xml .
 COPY ./server/mvnw .
 COPY ./server/.mvn .mvn
