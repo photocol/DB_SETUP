@@ -15,7 +15,9 @@ services:
         container_name: photocol_DB
         restart: always
         environment: 
-            MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+            MYSQL_ROOT_PASSWORD: ${RTP}
+            MYSQL_USER: photo_server
+            MYSQL_PASSWORD: ${PSP}
             MYSQL_DATABASE: photocol
         volumes:
             - ./script:/docker-entrypoint-initdb.d
@@ -53,7 +55,7 @@ services:
             dockerfile: Dockerfile.server
         container_name: backend
         environment:
-            DB_PASS: "password"
+            DB_PASS: ${PSP}
             DB_URL: "jdbc:mysql://db/photocol"
         volumes: 
             - ./.aws/:/app/.aws/
