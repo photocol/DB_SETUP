@@ -1,7 +1,7 @@
 # DB_SETUP
 ### Setup s3 credentials
 
-add .aws folder in working folder (not working)
+add .env file in working folder
 
 ### Setup git subtree:
 
