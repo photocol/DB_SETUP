@@ -50,10 +50,31 @@ sudo docker-compose up -d
 ```bash
 sudo docker-compose down
 ```
-### Rebuild Docker network
+### Rebuild Docker network (-d flag runs the docker network in detached mode)
 ```bash
 sudo docker-compose up --build
 ```
+### Basic docker commands:
+
+#### show running container list: (-a shows all containers, -q only show container id)
+
+docker ps 
+
+#### remove all container:
+
+docker rm -f $(docker ps -a -q)
+
+#### remove all images:
+
+docker rmi -f $(docker images -q)
+
+#### see docker compose log:
+
+docker-compose logs -t -f [name]
+#### interactive terminal with container: (service can be bash/sh etc.)
+
+docker exec -it [name] [service]
+
 ### Reset Database:
 ```bash
 rm -rf data/
