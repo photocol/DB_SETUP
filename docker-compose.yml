@@ -37,12 +37,11 @@ services:
         volumes: 
             - /etc/localtime:/etc/localtime:ro
             - ./backup/data:/backup
-            - ./backup/backup.sh:/etc/periodic/daily/backup.sh
         environment:
             MYSQL_CONTAINER_NAME: photocol_DB
             MYSQL_DATABASE: photocol
             MYSQL_USER: photo_server
-            MYSQL_PASSWORD: password
+            MYSQL_PASSWORD: ${PSP}
         depends_on:
             - db
         networks:
