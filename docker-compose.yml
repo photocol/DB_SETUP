@@ -21,7 +21,7 @@ services:
             MYSQL_DATABASE: photocol
         volumes:
             - ./script:/docker-entrypoint-initdb.d
-            - ./data:/var/lib/mysql
+            - ../DB/data:/var/lib/mysql
             - /etc/localtime:/etc/localtime:ro
         expose:
             - "3306"
@@ -36,7 +36,7 @@ services:
         restart: always
         volumes: 
             - /etc/localtime:/etc/localtime:ro
-            - ./backup/data:/backup
+            - ../DB/backup/data:/backup
         environment:
             MYSQL_CONTAINER_NAME: photocol_DB
             MYSQL_DATABASE: photocol
