@@ -2,6 +2,7 @@
 
 # prints the input
 function setup() {
+    git stash
     git remote remove server
     git remote remove website
     git remote add server https://github.com/photocol/photocol-server.git
