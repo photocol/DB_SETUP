@@ -53,7 +53,8 @@ services:
             dockerfile: Dockerfile.server
         container_name: backend
         environment:
-            DB_URL: "jdbc:mysql://db/"
+            DB_PASS: "password"
+            DB_URL: "jdbc:mysql://db/photocol"
         volumes: 
             - ./.aws/:/app/.aws/
         restart: always
