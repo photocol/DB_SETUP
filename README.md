@@ -8,9 +8,9 @@ add .env file in working folder
 ```bash
 . ./tree && setup
 ```
-### to run in localhost:
+### to setup for localhost:
 ```bash
-. ./tree && lo
+. ./tree && setup lo
 ```
 ### push (subtree ignored, default: master):
 ```bash
