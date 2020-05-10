@@ -34,8 +34,6 @@ sudo pacman -S docker-compose
 ```
 ### Start:
 ```bash
-./clear.sh
-
 sudo docker-compose up -d
 ```
 (website at localhost:1111)
