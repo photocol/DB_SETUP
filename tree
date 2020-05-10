@@ -16,6 +16,10 @@ function pull() {
     git pull origin master
 }
 
+function lo() {
+    cp -f ./.env.production ./website/.env.production
+}
+
 function push() {
     git add .
     git commit -m "auto"
