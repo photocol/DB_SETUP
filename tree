@@ -10,10 +10,10 @@ function setup() {
 
 function pull() {
     rm -rf website server
-    git pull origin master
     git clone -b dbv2 https://github.com/photocol/photocol-server.git server
     git clone -b dbv2 https://github.com/photocol/photocol-website.git website
     mvn -N io.takari:maven:wrapper -f ./server
+    git pull origin master
 }
 
 function push() {
