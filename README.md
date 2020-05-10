@@ -3,23 +3,15 @@
 
 add .env file in working folder
 
-### Setup git subtree:
+### Setup (update) git subtree:
 
 ```bash
 . ./tree && setup
 ```
-### pull subtree:
-default: website [dev]
-default: server [endpointsv1]
-
+### to run in localhost:
 ```bash
-. ./tree && pull
+. ./tree && lo
 ```
-custom:
-```bash
-. ./tree && pull [server/website] [branch]
-```
-
 ### push (subtree ignored, default: master):
 ```bash
 . ./tree && push [branch]
@@ -36,13 +28,13 @@ sudo pacman -S docker-compose
 ```bash
 sudo docker-compose up -d
 ```
-(website at localhost:1111)
+(website at :1111)
 
-(server at localhost:6700)
+(server at :6700)
 
-(database at localhost:6600)
+(database at :6600)
 
-(manage at localhost:8080)
+(manage at :8080)
 
 ### Stop:
 ```bash
@@ -76,5 +68,5 @@ docker exec -it [name] [service]
 ```
 ### Reset Database:
 ```bash
-rm -rf data/
+rm -rf ../DB/*
 ```
