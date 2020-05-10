@@ -2,7 +2,7 @@
 
 # prints the input
 function setup() {
-    git stash
+    rm -rf src website server
     git remote remove server
     git remote remove website
     git remote add server https://github.com/photocol/photocol-server.git
@@ -12,7 +12,6 @@ function setup() {
     git rm -r --cached website/
     git rm -r --cached server/
     mvn -N io.takari:maven:wrapper -f ./server
-    git stash pop
 }
 
 function pull() {
