@@ -8,7 +8,7 @@ import Authenticator from "../Authenticator/Authenticator";
 import { Button, Jumbotron, Container, ModalBody, Modal, Progress, ModalHeader } from 'reactstrap';
 import PhotoSelectorList from '../PhotoSelectorList/PhotoSelectorList';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBan, faFileUpload } from '@fortawesome/free-solid-svg-icons';
+import {faBan, faCheck, faFileUpload, faObjectUngroup} from '@fortawesome/free-solid-svg-icons';
 
 class Photos extends React.Component {
   constructor(props) {
@@ -20,6 +20,8 @@ class Photos extends React.Component {
       uploadCount: 0,
       uploadTotal: 0,
       uploadModal: false,
+      isSelectMode: !!props.onSelect || false,
+      isSelectComponent: !!props.onSelect
     };
 
     this.history = props.history;
@@ -35,7 +37,7 @@ class Photos extends React.Component {
   }
 
   confirmPhotoSelection = () => {
-    this.onSelect(this.state.photoList.filter(photo => photo.selected));
+    this.onSelect(this.state.photoList.filter(photo => photo.isSelected));
   };
 
   toggleUploadModal = () => this.setState({ uploadModal: !this.state.uploadModal });
@@ -78,8 +80,6 @@ class Photos extends React.Component {
         if(this.state.uploadCount === this.state.uploadTotal) {
           this.setState({uploadTotal: 0});
         }
-        //console.log("Uploaded Photos: " + this.state.uploadCount);
-        //console.log("Upload Total: " + this.state.uploadTotal);
         this.getPhotoList();
       }).catch(err => {
         console.log(err)
@@ -142,27 +142,57 @@ class Photos extends React.Component {
         </Modal>
 
         {/* control buttons go here */}
-        <Jumbotron fluid style={{marginBottom: 2}}>
+        <Jumbotron fluid style={{marginBottom: 2}} className={this.state.isSelectMode ? 'bg-dark text-light' : ''}>
           <Container>
             <div className="custom-file">
-              <h1 className={'display-1'}>All photos</h1>
+              <h1 className={'display-1'}>{this.state.isSelectMode ? 'Select' : 'Your' } photos</h1>
               <div>
+                {/* upload button always displays */}
                 <Button outline
                         className={'m-2'}
-                        color={'info'}
+                        color={'primary'}
                         onClick={this.toggleUploadModal}
                         title={'Upload photos'}>
                   <FontAwesomeIcon icon={faFileUpload} />
                 </Button>
-                <Button outline
-                        className={'m-2'}
-                        color={'danger'}
-                        title={'Delete selected photos'}
-                        onClick={this.deleteSelectedPhotos}
-                        disabled={selectedPhotos.length===0}>
-                  <FontAwesomeIcon icon={faBan} />
-                </Button>
-                <span>{selectedPhotos.length===0 ? '' : selectedPhotos.length + ' selected photos'}</span>
+                {/* confirm selection button shows when a select component */}
+                {
+                  this.state.isSelectComponent && (
+                    <Button outline
+                            className={'m-2'}
+                            color={'success'}
+                            title={'Confirm selection'}
+                            onClick={this.confirmPhotoSelection}>
+                      <FontAwesomeIcon icon={faCheck} />
+                    </Button>
+                  )
+                }
+                {/* select button displays when not a select component */}
+                {
+                  !this.state.isSelectComponent && (
+                    <Button outline
+                            className={'m-2'}
+                            color={'info'}
+                            title={'Toggle selection mode'}
+                            onClick={() => this.setState({isSelectMode: !this.state.isSelectMode})}>
+                      <FontAwesomeIcon icon={faObjectUngroup} />
+                    </Button>
+                  )
+                }
+                {/* delete button only shows when selecting and not a select component */}
+                {
+                  this.state.isSelectMode && !this.state.isSelectComponent && (
+                    <Button outline
+                            className={'m-2'}
+                            color={'danger'}
+                            title={'Delete selected photos'}
+                            onClick={this.deleteSelectedPhotos}
+                            disabled={selectedPhotos.length===0}>
+                      <FontAwesomeIcon icon={faBan} />
+                    </Button>
+                  )
+                }
+                <span>{!this.state.isSelectMode || selectedPhotos.length===0 ? '' : selectedPhotos.length + ' selected photos'}</span>
               </div>
             </div>
           </Container>
@@ -170,6 +200,7 @@ class Photos extends React.Component {
 
         {/* displaying the actual photos */}
         <PhotoSelectorList photoList={this.state.photoList}
+                           selectEnabled={this.state.isSelectMode}
                            onSelectedChange={photoList => this.setState({photoList: photoList})} />
       </div>
 
