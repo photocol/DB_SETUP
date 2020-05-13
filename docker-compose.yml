@@ -82,7 +82,7 @@ services:
             - /etc/localtime:/etc/localtime:ro
         restart: always
         ports:
-            - "1111:80"
+            - "80:80"
         depends_on:
             - server
         networks:
