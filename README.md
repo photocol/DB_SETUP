@@ -1,6 +1,6 @@
 # DB_SETUP
 ### Setup s3 credentials
-ahahaha
+aha
 
 add .env file in working folder
 
