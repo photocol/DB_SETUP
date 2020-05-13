@@ -1,72 +1,58 @@
-# DB_SETUP
-### Setup s3 credentials
+# Photocol Database Setup and Deployment
+The following instructions are to deploy the Photocol webapp using `docker-compose` and containers. If you want to develop this app, it would be better to try following the instructions on the [photocol-website][1] and [photocol-server][2] READMEs.
 
-add .env file in working folder
+### Setup instructions
+Make sure `docker` and `docker-compose` are installed and the docker daemon is running.
 
-### Setup (update) git subtree:
+###### Setup s3 credentials
+Add `.env` file in the working folder (this directory). The format of the `.env` file should be as follows:
+```env
+ROOT_PASSWORD=[the password for mysql root user]
+PHOTO_SERVER_PASSWORD=[the password for photo_server mysql user]
+AWS_ID=[aws s3 access key]
+AWS_KEY=[aws s3 private access key]
+```
 
+###### Setup (update) git subtree:
+This pulls the latest changes from photocol-website and photocol-server into the `website/` and `server/` subfolders.
 ```bash
 . ./tree && setup
 ```
-### to setup for localhost:
+
+Alternatively, if running on localhost:
 ```bash
 . ./tree && setup lo
 ```
-### push (subtree ignored, default: master):
-```bash
-. ./tree && push [branch]
-```
 
-### Dependency:
-```bash
-sudo pacman -S docker
-
-sudo pacman -S docker-compose
-
-```
-### Start:
+### Build instructions
+###### Starting the image
+Start the docker image (`-d` runs in detached mode):
 ```bash
 sudo docker-compose up -d
 ```
-(website at :1111)
+This runs the website at :80, server at :6700, database at :6600, and adminer (database administration web client) at :8080.
 
-(server at :6700)
-
-(database at :6600)
-
-(manage at :8080)
-
-### Stop:
-```bash
-sudo docker-compose down
-```
-### Rebuild Docker network (-d flag runs the docker network in detached mode)
+Rebuild and run docker image.
 ```bash
 sudo docker-compose up --build
 ```
-### Basic docker commands:
 
-#### show running container list: (-a shows all containers, -q only show container id)
+To view the logs:
 ```bash
-docker ps 
+sudo docker logs [CONTAINER-NAME]
 ```
-#### remove all container:
+where `[CONTAINER-NAME]` is one of `frontend`, `backend`, `photocol_DB`.
+
+###### Stopping the docker images
 ```bash
-docker rm -f $(docker ps -a -q)
+sudo docker-compose down
 ```
-#### remove all images:
-```bash
-docker rmi -f $(docker images -q)
-```
-#### see docker compose log:
-```bash
-docker-compose logs -t -f [name]
-```
-#### interactive terminal with container: (service can be bash/sh etc.)
-```bash
-docker exec -it [name] [service]
-```
-### Reset Database:
+
+###### Reset Database
+**BE CAREFUL**
 ```bash
 rm -rf ../DB/*
 ```
+
+[1]: https://github.com/photocol/photocol-website
+[2]: https://github.com/photocol/photocol-server
