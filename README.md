@@ -56,3 +56,5 @@ rm -rf ../DB/*
 
 [1]: https://github.com/photocol/photocol-website
 [2]: https://github.com/photocol/photocol-server
+
+Trying to trigger auto deploy, will delete later

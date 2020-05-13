@@ -11,4 +11,4 @@ src/
 .run/
 *.env*
 public/
-auto-deploy-log
+auto_deploy_log
