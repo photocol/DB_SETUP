@@ -24,7 +24,9 @@ BASE=$(git --git-dir=$DIR merge-base @ @{u})
 if [ $LOCAL = $REMOTE ]; then
     :
 elif [ $LOCAL = $BASE ]; then
-    git --git-dir=$DIR pull
+    sudo rm -rf server
+    git clone -b dbv2 https://github.com/photocol/photocol-server.git server
+    mvn -N io.takari:maven:wrapper -f ./server
     status=1
 elif [ $REMOTE = $BASE ]; then
     echo "remote-is-behind"
@@ -40,7 +42,8 @@ BASE=$(git --git-dir=$DIR merge-base @ @{u})
 if [ $LOCAL = $REMOTE ]; then
     :
 elif [ $LOCAL = $BASE ]; then
-    git --git-dir=$DIR pull
+    sudo rm -rf website
+    git clone -b dbv2 https://github.com/photocol/photocol-website.git website
     status=1
 elif [ $REMOTE = $BASE ]; then
     echo "remote-is-behind"
