@@ -3,8 +3,8 @@
 # prints the input
 function setup() {
     rm -rf website server
-    git clone -b dbv2 https://github.com/photocol/photocol-server.git server
-    git clone -b dbv2 https://github.com/photocol/photocol-website.git website
+    git clone -b master https://github.com/photocol/photocol-server.git server
+    git clone -b master https://github.com/photocol/photocol-website.git website
     mvn -N io.takari:maven:wrapper -f ./server
     if [ $1 = "lo" ]
         then
