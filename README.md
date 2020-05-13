@@ -1,6 +1,6 @@
 # DB_SETUP
 ### Setup s3 credentials
-
+changing for tewst
 add .env file in working folder
 
 ### Setup (update) git subtree:
