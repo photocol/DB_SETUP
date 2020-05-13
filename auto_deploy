@@ -10,7 +10,7 @@ if [ $LOCAL = $REMOTE ]; then
 elif [ $LOCAL = $BASE ]; then
     echo "Need to pull"
 elif [ $REMOTE = $BASE ]; then
-    echo "Need to push"
+    echo "$UPSTREAM"
 else
     echo "Diverged"
 fi
