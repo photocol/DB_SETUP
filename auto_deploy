@@ -1,16 +1,53 @@
 #!/bin/sh
-
-UPSTREAM=${1:-'@{u}'}
-LOCAL=$(git rev-parse @)
-REMOTE=$(git rev-parse "$UPSTREAM")
-BASE=$(git merge-base @ "$UPSTREAM")
-
+status=0
+DIR=./.git
+git --git-dir=$DIR fetch
+LOCAL=$(git --git-dir=$DIR rev-parse @)
+REMOTE=$(git --git-dir=$DIR rev-parse @{u})
+BASE=$(git --git-dir=$DIR merge-base @ @{u})
 if [ $LOCAL = $REMOTE ]; then
-    echo "Up-to-date"
+    :
 elif [ $LOCAL = $BASE ]; then
-    echo "Need to pull"
+    git pull
+    status=1
 elif [ $REMOTE = $BASE ]; then
-    echo "$UPSTREAM"
+    echo "remote-is-behind"
 else
-    echo "Diverged"
+    echo "big-trouble:conflicts"
+fi
+
+DIR=./server/.git
+git --git-dir=$DIR fetch
+LOCAL=$(git --git-dir=$DIR rev-parse @)
+REMOTE=$(git --git-dir=$DIR rev-parse @{u})
+BASE=$(git --git-dir=$DIR merge-base @ @{u})
+if [ $LOCAL = $REMOTE ]; then
+    :
+elif [ $LOCAL = $BASE ]; then
+    git --git-dir=$DIR pull
+    status=1
+elif [ $REMOTE = $BASE ]; then
+    echo "remote-is-behind"
+else
+    echo "big-trouble:conflicts"
+fi
+
+DIR=./website/.git
+git --git-dir=$DIR fetch
+LOCAL=$(git --git-dir=$DIR rev-parse @)
+REMOTE=$(git --git-dir=$DIR rev-parse @{u})
+BASE=$(git --git-dir=$DIR merge-base @ @{u})
+if [ $LOCAL = $REMOTE ]; then
+    :
+elif [ $LOCAL = $BASE ]; then
+    git --git-dir=$DIR pull
+    status=1
+elif [ $REMOTE = $BASE ]; then
+    echo "remote-is-behind"
+else
+    echo "big-trouble:conflicts"
+fi
+
+if [ $status = 1 ]; then
+    docker-compose up -d --build
 fi
