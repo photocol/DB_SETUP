@@ -1,0 +1,103 @@
+Updating eaa7bfc..faab9a2
+Step 1/7 : FROM alpine:latest
+ ---> f70734b6a266
+Step 2/7 : WORKDIR ./
+ ---> Using cache
+ ---> bdb780158ff6
+Step 3/7 : COPY ./backup.sh /scripts/backup.sh
+ ---> Using cache
+ ---> cde05854b3c4
+Step 4/7 : ENV PACKAGES mariadb-client
+ ---> Using cache
+ ---> bb758794f6ac
+Step 5/7 : RUN apk update &&     apk upgrade &&     apk add --no-cache $PACKAGES
+ ---> Using cache
+ ---> f298ef4d6d6d
+Step 6/7 : RUN chmod a+x /scripts/backup.sh
+ ---> Using cache
+ ---> ddc56282da57
+Step 7/7 : RUN rm -f /var/spool/cron/crontabs/root &&     touch /var/spool/cron/crontabs/root &&     (crontab -l ; echo "0       */3     *       *       *       /scripts/backup.sh") | crontab -
+ ---> Using cache
+ ---> ea093ac081be
+
+Successfully built ea093ac081be
+Successfully tagged photocol_backup:latest
+Step 1/12 : FROM openjdk:15-jdk-alpine as medium
+ ---> b304e8ae762d
+Step 2/12 : WORKDIR /app
+ ---> Using cache
+ ---> d62df273ba38
+Step 3/12 : COPY ./server/pom.xml .
+ ---> Using cache
+ ---> 349809d71691
+Step 4/12 : COPY ./server/mvnw .
+ ---> Using cache
+ ---> d10c65a18d66
+Step 5/12 : COPY ./server/.mvn .mvn
+ ---> Using cache
+ ---> 7832f9f5e7c2
+Step 6/12 : RUN ./mvnw dependency:go-offline -B
+ ---> Using cache
+ ---> 5589d8bd1d46
+Step 7/12 : COPY ./server/src ./src
+ ---> Using cache
+ ---> 9c4c0af4f321
+Step 8/12 : RUN ./mvnw package -DskipTests
+ ---> Using cache
+ ---> 0240781d0608
+
+Step 9/12 : FROM openjdk:15-jdk-alpine
+ ---> b304e8ae762d
+Step 10/12 : WORKDIR /app
+ ---> Using cache
+ ---> d62df273ba38
+Step 11/12 : COPY --from=medium /app/target/photocol-server-*.jar ./server.jar
+ ---> Using cache
+ ---> bf623d15add5
+Step 12/12 : ENTRYPOINT ["java","-jar","server.jar"]
+ ---> Using cache
+ ---> f766e6398200
+
+Successfully built f766e6398200
+Successfully tagged photocol_server:latest
+Step 1/13 : FROM node:alpine as build
+ ---> 87c43f8d8077
+Step 2/13 : WORKDIR /app
+ ---> Using cache
+ ---> 161eb905ac97
+Step 3/13 : COPY ./website/package.json ./
+ ---> Using cache
+ ---> 4d0f3524dd31
+Step 4/13 : COPY ./website/package-lock.json ./
+ ---> Using cache
+ ---> 09b9ba411471
+Step 5/13 : RUN npm ci --silent
+ ---> Using cache
+ ---> b7ce1158e03a
+Step 6/13 : RUN npm install react-scripts@3.4.1 -g --silent
+ ---> Using cache
+ ---> 342252ade112
+Step 7/13 : COPY ./website ./
+ ---> Using cache
+ ---> b565b52b2267
+Step 8/13 : RUN npm run build
+ ---> Using cache
+ ---> 286a2042b2b0
+
+Step 9/13 : FROM nginx:mainline
+ ---> 602e111c06b6
+Step 10/13 : COPY --from=build /app/build /var/www/photocol.com
+ ---> Using cache
+ ---> 96f3585f1e62
+Step 11/13 : COPY ./nginx.conf /etc/nginx/nginx.conf
+ ---> Using cache
+ ---> 9f9c7f8c8137
+Step 12/13 : EXPOSE 80
+ ---> Using cache
+ ---> 112b93d742c3
+Step 13/13 : CMD ["nginx", "-g", "daemon off;"]
+ ---> Using cache
+ ---> 968c997fdde5
+
+Successfully built 968c997fdde5
+Successfully tagged photocol_webclient:latest

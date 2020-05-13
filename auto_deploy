@@ -8,7 +8,7 @@ BASE=$(git --git-dir=$DIR merge-base @ @{u})
 if [ $LOCAL = $REMOTE ]; then
     :
 elif [ $LOCAL = $BASE ]; then
-    git pull
+    git --git-dir=$DIR pull
     status=1
 elif [ $REMOTE = $BASE ]; then
     echo "remote-is-behind"
@@ -49,5 +49,7 @@ else
 fi
 
 if [ $status = 1 ]; then
-    docker-compose up -d --build
+    sudo docker-compose up -d --build
+else
+    echo "up-to-date"
 fi
