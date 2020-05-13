@@ -1,6 +1,7 @@
 # DB_SETUP
 ### Setup s3 credentials
-asdasdavasdvasdcasdc
+asdasdavasdvasdcasdchahahahaha
+
 add .env file in working folder
 
 ### Setup (update) git subtree:
