@@ -9,6 +9,6 @@ website/
 logs/
 src/
 .run/
-*.env*
+*.env
 public/
 auto_deploy_log
